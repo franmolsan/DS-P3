@@ -3,7 +3,7 @@
 * Miguel Ángel Molina Jordán
 
 ## 1. Requisitos Funcionales
---------
+
 1. El juego debe tener un sistema para que el usuario pueda iniciar sesión o registrarse.
 
 2. Se debe poder almacenar la puntuación de cada partida, de forma que se puedan consultar las puntuaciones de otros jugadores (leaderboard).
@@ -18,7 +18,7 @@
 
 
 ## 2. Requisitos no Funcionales
------
+
 
 1. La aplicación tendrá unos controles sencillos, para que pueda jugarse desde dispositivos móviles.
 
