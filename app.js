@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const rutas = require('./routes/main');
 const rutasSeguras = require('./routes/secure');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
  
 // conectar con mongo
 const uri = process.env.MONGO_CONNECTION_URL;
@@ -24,12 +26,17 @@ const app = express();
 // configuración de express
 app.use(bodyParser.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
+
+app.use(cookieParser());
+ 
+// autenticación passport
+require('./auth/auth');
  
 // rutas estándar
 app.use('/', rutas);
 
 // rutas seguras
-app.use('/', rutasSeguras);
+app.use('/', passport.authenticate('jwt', { session : false }), rutasSeguras);
 
 // resto de rutas (404 - not found)
 app.use((req, res, next) => {

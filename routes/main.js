@@ -1,53 +1,84 @@
+const passport = require('passport');
 const express = require('express');
+const jwt = require('jsonwebtoken');
+ 
+const tokenList = {};
 const router = express.Router();
  
-const asyncMiddleware = require('../middleware/asyncMiddleware');
-const ModeloUsuario = require('../modelos/modeloUsuario');
-
-// "endpoints" (rutas) para las funciones del servidor
 router.get('/status', (req, res, next) => {
-  res.status(200);
-  res.json({ 'status': 'ok' });
-  console.log('acceso a status');
-});
-
-// ruta para el signup
-router.post('/signup', asyncMiddleware( async (req, res, next) => {
-  // utilizamos el middleware para que este gestione los errores
-  const { nombre, email, pass } = req.body;
-  await ModeloUsuario.create({ email, pass, nombre });
-  res.status(200).json({ 'status': 'ok' });
-}));
- 
-
-router.post('/login', asyncMiddleware(async (req, res, next) => {
-  // utilizamos el middleware para que este gestione los errores
-  const { email, pass } = req.body;
-  const usuario = await ModeloUsuario.findOne({ email }); // buscar usuario con el email introducido
-  if (!usuario) { // no encontramos usuario con ese email 
-    res.status(401).json({ 'mensaje': 'no autenticado' });
-    return;
-  }
-  const validacion = await usuario.passValida(pass); // validar contraseña
-  if (!validacion) { // contraseña incorrecta
-    res.status(401).json({ 'mensaje': 'no autenticado' });
-    return;
-  }
-
-  // email y contraseña correctos
-  res.status(200).json({ 'status': 'ok' });
-}));
- 
-router.post('/logout', (req, res, next) => {
-  res.status(200);
-  res.json({ 'status': 'ok' });
-  console.log('acceso a logout');
+  res.status(200).json({ status: 'ok' });
 });
  
-router.post('/token', (req, res, next) => {
-  res.status(200);
-  res.json({ 'status': 'ok' });
-  console.log('acceso a token');
+router.post('/signup', passport.authenticate('signup', { session: false }), async (req, res, next) => {
+  res.status(200).json({ mensaje: 'Registro correcto' });
+});
+ 
+router.post('/login', async (req, res, next) => {
+  passport.authenticate('login', async (err, user, info) => {
+    try {
+      if (err || !user) {
+        const error = new Error('Ha ocurrido un error');
+        return next(error);
+      }
+      req.login(user, { session: false }, async (error) => {
+        if (error) return next(error);
+        const body = {
+          _id: user._id,
+          email: user.email
+        };
+ 
+        const token = jwt.sign({ user: body }, 'top_secret', { expiresIn: 300 }); // 5 mins
+        const refreshToken = jwt.sign({ user: body }, 'top_secret_refresh', { expiresIn: 86400 }); // 1 dia
+ 
+        // guardar tokens en la cookie
+        res.cookie('jwt', token);
+        res.cookie('refreshJwt', refreshToken);
+ 
+        // guardar tokens en memoria
+        tokenList[refreshToken] = {
+          token,
+          refreshToken,
+          email: user.email,
+          _id: user._id
+        };
+ 
+        // Devolver tokens al usuario
+        return res.status(200).json({ token, refreshToken });
+      });
+    } catch (error) {
+      return next(error);
+    }
+  })(req, res, next);
+});
+ 
+router.post('/token', (req, res) => {
+  const { email, refreshToken } = req.body;
+ 
+  if ((refreshToken in tokenList) && (tokenList[refreshToken].email === email)) {
+    const body = { email, _id: tokenList[refreshToken]._id };
+    const token = jwt.sign({ user: body }, 'top_secret', { expiresIn: 300 });
+ 
+    // actualiza jwt
+    res.cookie('jwt', token);
+    tokenList[refreshToken].token = token;
+ 
+    res.status(200).json({ token });
+  } else {
+    res.status(401).json({ message: 'No autorizado' });
+  }
+});
+ 
+router.post('/logout', (req, res) => {
+
+  // si la petición tenía cookie, es porque el usuario estaba logeado
+  if (req.cookies) {
+    const refreshToken = req.cookies['refreshJwt'];
+    if (refreshToken in tokenList) delete tokenList[refreshToken]
+    res.clearCookie('refreshJwt');
+    res.clearCookie('jwt');
+  }
+ 
+  res.status(200).json({ mensaje: 'Logout correcto' });
 });
  
 module.exports = router;
