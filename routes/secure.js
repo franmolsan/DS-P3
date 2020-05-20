@@ -1,3 +1,5 @@
+/* fichero para las rutas seguras */
+
 const express = require('express');
 const asyncMiddleware = require('../middleware/asyncMiddleware');
 const UserModel = require('../models/userModel');
@@ -11,6 +13,10 @@ router.post('/submit-score', asyncMiddleware(async (req, res, next) => {
 }));
 
 router.get('/scores', asyncMiddleware(async (req, res, next) => {
+
+  // obtener todos los highScores (puntuaciones máximas)
+  // ordenarlos descendentemente
+  // devoler los 10 primeros
   const users = await UserModel.find({}, 'name highScore -_id').sort({ highScore: -1}).limit(10);
   res.status(200).json(users);
 }));

@@ -1,3 +1,6 @@
+/* para obtener el token y refrescarlo */
+
+// función para obtener el valor de la cookie 
 function getCookie(cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -14,6 +17,7 @@ function getCookie(cname) {
   return "";
 }
 
+// obtener token cada 10 segundos.
 setInterval(function() {
   $.ajax({
     type: 'POST',

@@ -30,11 +30,11 @@ router.post('/login', async (req, res, next) => {
         const token = jwt.sign({ user: body }, 'top_secret', { expiresIn: 300 });
         const refreshToken = jwt.sign({ user: body }, 'top_secret_refresh', { expiresIn: 86400 });
 
-        // store tokens in cookie
+        // guardar tokens en la cookie
         res.cookie('jwt', token);
         res.cookie('refreshJwt', refreshToken);
 
-        // store tokens in memory
+        // guardar tokens en memoria
         tokenList[refreshToken] = {
           token,
           refreshToken,
@@ -42,7 +42,7 @@ router.post('/login', async (req, res, next) => {
           _id: user._id
         };
 
-        //Send back the token to the user
+        // Devolver tokens al usuario
         return res.status(200).json({ token, refreshToken });
       });
     } catch (error) {
@@ -57,7 +57,7 @@ router.post('/token', (req, res) => {
     const body = { email: tokenList[refreshToken].email, _id: tokenList[refreshToken]._id };
     const token = jwt.sign({ user: body }, 'top_secret', { expiresIn: 300 });
 
-    // update jwt
+    // actualiza jwt
     res.cookie('jwt', token);
     tokenList[refreshToken].token = token;
 
@@ -68,6 +68,8 @@ router.post('/token', (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
+
+  // si la petición tenía cookie, es porque el usuario estaba logeado
   if (req.cookies) {
     const refreshToken = req.cookies['refreshJwt'];
     if (refreshToken in tokenList) delete tokenList[refreshToken]

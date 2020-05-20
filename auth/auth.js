@@ -4,7 +4,7 @@ const JWTstrategy = require('passport-jwt').Strategy;
 
 const UserModel = require('../models/userModel');
 
-// handle user registration
+// para el registro (signup) del usuario
 passport.use('signup', new localStrategy({
   usernameField: 'email',
   passwordField: 'password',
@@ -19,7 +19,8 @@ passport.use('signup', new localStrategy({
   }
 }));
 
-// handle user login
+
+// para el inicio de sesión (login) del usuario
 passport.use('login', new localStrategy({
   usernameField: 'email',
   passwordField: 'password'
@@ -39,7 +40,9 @@ passport.use('login', new localStrategy({
   }
 }));
 
-// verify token is valid
+
+// verificar que el token es válido
+// el jwt (json web token) estará en una cookie
 passport.use(new JWTstrategy({
   secretOrKey: 'top_secret',
   jwtFromRequest: function (req) {
