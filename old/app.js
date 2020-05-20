@@ -1,16 +1,16 @@
-// reads in our .env file and makes those values available as environment variables
+// leer fichero .env para tener disponibles las variables de entorno
 require('dotenv').config();
-
+ 
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const rutas = require('./routes/main');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
+const rutasSeguras = require('./routes/secure');
 
-const routes = require('./routes/main');
-const secureRoutes = require('./routes/secure');
-
-// setup mongo connection
+ 
+// conectar con mongo
 const uri = process.env.MONGO_CONNECTION_URL;
 mongoose.connect(uri, { useNewUrlParser : true, useCreateIndex: true });
 mongoose.connection.on('error', (error) => {
@@ -18,47 +18,47 @@ mongoose.connection.on('error', (error) => {
   process.exit(1);
 });
 mongoose.connection.on('connected', function () {
-  console.log('connected to mongo');
+  console.log('Conexión a mongo establecida');
 });
 
-// create an instance of an express app
+// instancia de express
 const app = express();
-
-// update express settings
+ 
+// configuración de express
 app.use(bodyParser.urlencoded({ extended: false })); // parse application/x-www-form-urlencoded
 app.use(bodyParser.json()); // parse application/json
 app.use(cookieParser());
-
-// require passport auth
+ 
+// autenticación passport
 require('./auth/auth');
-
-app.get('/game.html', passport.authenticate('jwt', { session : false }), function (req, res) {
-  res.sendFile(__dirname + '/public/game.html');
-});
-
+ 
+// para servir ficheros estáticos
 app.use(express.static(__dirname + '/public'));
-
+ 
+// root -> index.html
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
-// main routes
-app.use('/', routes);
-app.use('/', passport.authenticate('jwt', { session : false }), secureRoutes);
+// rutas estándar
+app.use('/', rutas);
 
-// catch all other routes
+// rutas seguras
+app.use('/', passport.authenticate('jwt', { session : false }), rutasSeguras);
+
+// resto de rutas (404 - not found)
 app.use((req, res, next) => {
-  res.status(404).json({ message: '404 - Not Found' });
+  res.status(404);
+  res.json({ message: '404 - Not Found' });
 });
-
-// handle errors
+ 
+// ruta para errores
 app.use((err, req, res, next) => {
-  // TODO: add note about updating this
-  console.log(err.message);
-  res.status(err.status || 500).json({ error: err.message });
+  res.status(err.status || 500);
+  res.json({ error : err });
 });
-
-// have the server start listening on the provided port
+ 
+// iniciar el servidor (escucha en el puerto 3000)
 app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server started on port ${process.env.PORT || 3000}`);
+  console.log(`Servidor escuchando en el puerto ${process.env.PORT || 3000}`);
 });

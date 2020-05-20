@@ -1,32 +1,25 @@
 {
-  "name": "DS-P3",
+  "name": "server",
   "version": "1.0.0",
-  "description": "* Francisco José Molina Sánchez * Miguel Ángel Molina Jordán",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/franmolsan/DS-P3.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/franmolsan/DS-P3/issues"
-  },
-  "homepage": "https://github.com/franmolsan/DS-P3#readme",
+  "description": "",
+  "main": "app.js",
   "dependencies": {
-    "bcrypt": "^4.0.1",
-    "body-parser": "^1.19.0",
+    "bcrypt": "^3.0.4",
+    "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.5",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.9.13",
+    "mongoose": "^5.4.11",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
