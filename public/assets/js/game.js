@@ -44,8 +44,8 @@ class Highscore extends Phaser.Scene {
 let config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 1000,
-  height: 800,
+  width: window.innerWidth * window.devicePixelRatio,
+  height: window.innerHeight * window.devicePixelRatio,
   pixelArt: true,
   scene: [Highscore]
 };

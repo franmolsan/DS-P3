@@ -9,6 +9,7 @@ const passport = require('passport');
 
 const routes = require('./routes/main');
 const secureRoutes = require('./routes/secure');
+const passwordRoutes = require('./routes/password');
 
 // conectar con mongo
 const uri = process.env.MONGO_CONNECTION_URL;
@@ -20,6 +21,7 @@ mongoose.connection.on('error', (error) => {
 mongoose.connection.on('connected', function () {
   console.log('connected to mongo');
 });
+mongoose.set('useFindAndModify', false);
 
 // instancia de express
 const app = express();
@@ -46,6 +48,8 @@ app.get('/', function (req, res) {
 
 // rutas estándar
 app.use('/', routes);
+// rutas para cambio de contraseña
+app.use('/', passwordRoutes);
 // rutas seguras
 app.use('/', passport.authenticate('jwt', { session : false }), secureRoutes);
 
