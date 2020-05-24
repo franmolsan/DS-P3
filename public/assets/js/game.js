@@ -12,10 +12,18 @@ class Highscore extends Phaser.Scene {
   }
 
   preload() { // cargar tipografía
+    this.load.image('fondo', 'assets/Strip And GIF/GIF_4FPS/space4_4-frames.gif');
     this.load.bitmapFont('arcade', 'assets/arcade.png', 'assets/arcade.xml');
   }
 
   create() {
+    let image = this.add.image(this.cameras.main.width / 2, this.cameras.main.height / 2, 'fondo')
+    let scaleX = this.cameras.main.width / image.width
+    let scaleY = this.cameras.main.height / image.height
+    let scale = Math.max(scaleX, scaleY)
+    image.setScale(scale).setScrollFactor(0)
+    //this.add.image(0, 0, 'fondo').setOrigin(0).setScale(scale).setScrollFactor(0);
+    //this.add.image(0, 0, 'fondo').SetOrigin(0, 0);
     this.add.bitmapText(70, 110, 'arcade', 'POSICION PUNTUACION NOMBRE').setTint(0xffffff);
 
     // obtener los 10 primeros highscores
@@ -44,8 +52,8 @@ class Highscore extends Phaser.Scene {
 let config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: window.innerWidth * window.devicePixelRatio,
-  height: window.innerHeight * window.devicePixelRatio,
+  width: 1200, //window.innerWidth * window.devicePixelRatio,
+  height: 800, //window.innerHeight * window.devicePixelRatio,
   pixelArt: true,
   scene: [Highscore]
 };
