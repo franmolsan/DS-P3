@@ -1,6 +1,6 @@
 import { CST } from "../CST.js"; // importar claves
 import { HighscoreScene } from "./HighscoreScene.js";
-
+var musica_menu;
 // clase "MenuScene" (Escena del menú)
 export class MenuScene extends Phaser.Scene {
     
@@ -10,9 +10,8 @@ export class MenuScene extends Phaser.Scene {
         })
     }
 
-    init(data){
-        console.log(data);
-        console.log("I GOT IT");
+    init(m_menu){
+        musica_menu = m_menu;
     }
 
     create(){
@@ -39,6 +38,10 @@ export class MenuScene extends Phaser.Scene {
             playButton.setScale(5).setScrollFactor(0);
         })
 
+        playButton.on("pointerdown", () => {
+            this.scene.start(CST.SCENES.GAME, musica_menu)
+        })
+
 
         /* Botón de ranking */ 
         let rankingButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2 + this.game.renderer.height / 4, 'ranking')
@@ -62,17 +65,12 @@ export class MenuScene extends Phaser.Scene {
         })
 
         rankingButton.on("pointerdown", () => {
-            this.scene.add(CST.SCENES.HIGHSCORE, HighscoreScene, false);
             this.scene.start(CST.SCENES.HIGHSCORE,"se lo paso a highscore")
         })
 
         /* Logo */
-        this.add.bitmapText(this.game.renderer.width / 2, this.game.renderer.height / 2 - this.game.renderer.height / 4, 'arcade', `AW-435`, 60).setTint(0xffffff).setOrigin(0.5);
+        this.add.bitmapText(this.game.renderer.width / 2, this.game.renderer.height / 2 - this.game.renderer.height / 4, 'arcade', `AW-435`, 75).setTint(0xffffff).setOrigin(0.5);
     
-        /* Musica */
-        this.sound.pauseOnBlur = false; // para que se escuche siempre, sin importar si se tabula o se cambia de pestaña
-
-        this.sound.play ('musica_menu', { loop : true });
-
+   
     }
 }

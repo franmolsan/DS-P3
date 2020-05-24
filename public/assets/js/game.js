@@ -16,6 +16,13 @@ let config = {
   ],
   audio: {
     disableWebAudio: false
+  },
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0 },
+      debug: false
+    }
   }
 };
 

@@ -3,6 +3,7 @@ export const CST =  {
     SCENES : {
         HIGHSCORE: "HIGHSCORE",
         LOAD: "LOAD",
-        MENU: "MENU"
+        MENU: "MENU",
+        GAME: "GAME"
     }
 }

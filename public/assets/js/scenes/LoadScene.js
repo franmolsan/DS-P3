@@ -1,5 +1,7 @@
 import { CST } from "../CST.js"; // importar claves
 import { MenuScene } from "./MenuScene.js";
+import { HighscoreScene } from "./HighscoreScene.js";
+import { GameScene } from "./GameScene.js";
 
 
 // clase "LoadScene" (Escena de carga)
@@ -16,12 +18,11 @@ export class LoadScene extends Phaser.Scene {
     }
     
     preload(){
-
         // cargar tipografia
         this.load.bitmapFont('arcade', 'assets/arcade.png', 'assets/arcade.xml');
 
         // cargar fondo 
-        this.load.image('fondo', 'assets/Strip And GIF/GIF_4FPS/space4_4-frames.gif');
+        this.load.image('fondo', 'assets/Strip And GIF/space_game.png');
         
         // cargar imagen para el botón de jugar
         this.load.image ('boton_play','assets/play.png');
@@ -37,7 +38,7 @@ export class LoadScene extends Phaser.Scene {
 
         // cargar imagen personaje
         this.load.spritesheet('personaje', 'assets/ship.png', {
-            frameHeight: 16,
+            frameHeight: 24,
             frameWidth: 16
         });
 
@@ -76,8 +77,21 @@ export class LoadScene extends Phaser.Scene {
     }
 
     create(){
-        // pasar a la escena del menú
+        this.scene.add(CST.SCENES.GAME, GameScene, false);
+        this.scene.add(CST.SCENES.HIGHSCORE, HighscoreScene, false);
         this.scene.add(CST.SCENES.MENU, MenuScene, false);
-        this.scene.start(CST.SCENES.MENU, "hello from load scene"); 
+
+        /* Musica */
+        this.sound.pauseOnBlur = false; // para que se escuche siempre, sin importar si se tabula o se cambia de pestaña
+
+        var musica_menu = this.sound.add('musica_menu');
+
+        musica_menu.play({
+            loop: true
+        });
+
+
+        // pasar a la escena del menú
+        this.scene.start(CST.SCENES.MENU, musica_menu); 
     }
 }

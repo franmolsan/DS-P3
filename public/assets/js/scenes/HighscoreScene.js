@@ -1,4 +1,5 @@
 import { CST } from "../CST.js"; // importar claves
+import { MenuScene } from "./MenuScene.js";
 
 let game, scores;
 
@@ -28,31 +29,58 @@ export class HighscoreScene extends Phaser.Scene {
       let scaleY = this.cameras.main.height / image.height
       let scale = Math.max(scaleX, scaleY)
       image.setScale(scale).setScrollFactor(0)
-      //this.add.image(0, 0, 'fondo').setOrigin(0).setScale(scale).setScrollFactor(0);
-      //this.add.image(0, 0, 'fondo').SetOrigin(0, 0);
-      this.add.bitmapText(70, 110, 'arcade', 'POSICION PUNTUACION NOMBRE').setTint(0xffffff);
+      this.add.bitmapText(60, 60, 'arcade', 'POSICION PUNTUACION NOMBRE').setTint(0xffffff);
   
       // obtener los 10 primeros highscores
       // y formatearlos
       for (let i = 1; i < 11; i++) {
         if (i!= 10){
           if (scores[i-1]) {
-            this.add.bitmapText(150, 160 + 50 * i, 'arcade', ` ${i}         ${scores[i-1].highScore}      ${scores[i-1].name}`).setTint(0xffffff);
+            this.add.bitmapText(150, 80 + 50 * i, 'arcade', ` ${i}         ${scores[i-1].highScore}      ${scores[i-1].name}`).setTint(0xffffff);
           } 
           else {
-            this.add.bitmapText(150, 160 + 50 * i, 'arcade', ` ${i}         0      ---`).setTint(0xffffff);
+            this.add.bitmapText(150, 80 + 50 * i, 'arcade', ` ${i}         0      ---`).setTint(0xffffff);
           }
         }
         else {
           if (scores[i-1]) {
-            this.add.bitmapText(150, 160 + 50 * i, 'arcade', `${i}         ${scores[i-1].highScore}      ${scores[i-1].name}`).setTint(0xffffff);
+            this.add.bitmapText(150, 80 + 50 * i, 'arcade', `${i}         ${scores[i-1].highScore}      ${scores[i-1].name}`).setTint(0xffffff);
           } 
           else {
-            this.add.bitmapText(150, 160 + 50 * i, 'arcade', `${i}         0      ---`).setTint(0xffffff);
+            this.add.bitmapText(150, 80 + 50 * i, 'arcade', `${i}         0      ---`).setTint(0xffffff);
           }
         }
       }
+
+      /* Botón de ranking */ 
+      let backButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2 + this.game.renderer.height / 2.8, 'back')
+      backButton.setScale(0.7).setScrollFactor(0);
+
+      backButton.setInteractive();
+
+      /* Eventos de puntero */
+      /*  pointerover: hover (pasar por encima el ratón)
+          pointerout: fuera (no hover)
+          pointerup: click y soltar
+          pointerdown: solo click
+      */
+
+      backButton.on("pointerover", () => {
+        backButton.setScale(0.8).setScrollFactor(0);
+      })
+
+      backButton.on("pointerout", () => {
+        backButton.setScale(0.7).setScrollFactor(0);
+      })
+
+      backButton.on("pointerdown", () => {
+        
+        this.scene.start(CST.SCENES.MENU)
+      })
+
     }
+
+
   }
 
   // petición para obtener las highscores
