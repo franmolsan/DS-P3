@@ -15,7 +15,12 @@ export class DeathScene extends Phaser.Scene {
     init(s){
         musica_fin = this.sound.add('musica_fin');
         musica_fin.play();
-        score = s;
+        if (isNaN(s)){
+            score = 0;
+        }
+        else {
+            score = s;
+        }
     }
 
     preload(){

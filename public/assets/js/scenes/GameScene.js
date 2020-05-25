@@ -2,7 +2,7 @@ import { CST } from "../CST.js"; // importar claves
 
 /* Variables */
 var cursors;
-var musica_menu;
+var spaceBar;
 var player;
 var gameStarted;
 var dificultad;
@@ -13,6 +13,14 @@ var updateScore;
 var max_x;
 var max_y;
 var pauseButton;
+
+// habilidad
+var choques;
+var invulnerable;
+var cooldown;
+var valor_cooldown;
+var check_cooldown;
+var cooldownText;
 
 // score
 var score;
@@ -41,6 +49,9 @@ export class GameScene extends Phaser.Scene {
 
         score = 0;
         dificultad = 1;
+        invulnerable = false;
+        check_cooldown = false;
+        valor_cooldown = 0;
     }
 
     preload(){
@@ -61,7 +72,8 @@ export class GameScene extends Phaser.Scene {
         let scale = Math.max(scaleX, scaleY) 
         image.setScale(scale).setScrollFactor(0) // para que ocupe toda la pantalla del juego
         
-        scoreText = this.add.text(32, 24, scoreString + score);
+        cooldownText = this.add.bitmapText(32, this.cameras.main.height - 40, 'arcade', scoreString + score, 15);
+        scoreText = this.add.bitmapText (32, 40, 'arcade', scoreString + score, 15);
         pauseButton = this.add.image(75, 100, 'pause');
 
         pauseButton.setInteractive();
@@ -98,11 +110,12 @@ export class GameScene extends Phaser.Scene {
         // Para que el jugador no salga de los bordes
         player.setCollideWorldBounds(true);
         asteroides = this.physics.add.group();
-        this.physics.add.collider(player, asteroides, hitAsteroide, null, this);
+        choques = this.physics.add.collider(player, asteroides, hitAsteroide, null, this);
 
         // Keyboard input
         cursors = this.input.keyboard.createCursorKeys();
-    
+        spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
         gameOver = false;
         gameStarted = true;
         dificultad = 1;
@@ -147,6 +160,28 @@ export class GameScene extends Phaser.Scene {
                 player.anims.play("finish-right");
                 
             }
+
+            if (spaceBar.isDown && !invulnerable && valor_cooldown === 0){
+                choques.active = false;
+                invulnerable = true;
+                player.setTint(0x808080);
+                this.time.addEvent({ delay: 1000, callback: setInvulnerableEvent, callbackScope: this, repeat : 1 });
+                cooldown = this.time.addEvent({ delay: 5000 });  
+                check_cooldown = true;         
+            }
+
+            if (check_cooldown){
+                valor_cooldown = 5 - 5 * cooldown.getProgress().toString().substr(0, 4);
+            }
+    
+            if (valor_cooldown === 0){
+                cooldownText.setText("Habilidad lista");
+                check_cooldown = false;
+            }
+           else{
+                cooldownText.setText("Habilidad lista en " + valor_cooldown.toString().substr(0,1));
+            }
+
         }
 
         if(gameOver){
@@ -199,6 +234,7 @@ function updateScoreEvent (){
         scoreText.setText(scoreString + score);
         dificultad += 0.1;
         updateScore.reset({ delay: 1000, callback: updateScoreEvent, callbackScope: this, repeat: 1 })
+
     }
         
 }
@@ -323,4 +359,11 @@ function setPathAsteroide(asteroide){
     }
 
     asteroide.ast.setVelocity(vel_x, vel_y);
+}
+
+function setInvulnerableEvent(){
+    player.setTint(0xffffff);
+    choques.active = true;
+    invulnerable = false;
+
 }
