@@ -7,6 +7,11 @@ var player;
 var gameStarted;
 var dificultad;
 var tiempo_inicial;
+var asteroides;
+var gameOver;
+var spawnAsteroide;
+var max_x;
+var max_y;
 
 // score
 var score = 0;
@@ -108,17 +113,28 @@ export class GameScene extends Phaser.Scene {
         */
 
 
-        // Player should collide with edges of the screen
+        // Para que el jugador no salga de los bordes
         player.setCollideWorldBounds(true);
+
+        asteroides = this.physics.add.group();
+        this.physics.add.collider(player, asteroides, hitAsteroide, null, this);
 
         // Keyboard input
         cursors = this.input.keyboard.createCursorKeys();
     
+        gameOver = false;
         gameStarted = true;
+        dificultad = 1;
         tiempo_inicial = Date.now();
-        setInterval( () => {score += 10;
+        setInterval( () => {
+            score += 10;
             scoreText.setText(scoreString + score);
+            dificultad += 0.1;
         },1000);
+
+        max_x = this.cameras.main.width;
+        max_y = this.cameras.main.height;
+        spawnAsteroide = this.time.addEvent({ delay: 100, callback: onEvent, callbackScope: this });
     }
 
     update (){
@@ -126,7 +142,6 @@ export class GameScene extends Phaser.Scene {
         player.setVelocity(0, 0);
 
         if (gameStarted) {
-
 
             if (cursors.up.isDown) {
                 //  Move up
@@ -156,6 +171,125 @@ export class GameScene extends Phaser.Scene {
                 
             }
         }
+
+        if (gameOver){
+
+        }
     }
     
+}
+
+
+function onEvent (){
+    var ast = createAsteroide();
+    setPathAsteroide(ast);
+    spawnAsteroide.reset({ delay: Phaser.Math.Between(2000,4000)/dificultad, callback: onEvent, callbackScope: this, repeat: 1});
+}
+
+function hitAsteroide (player, asteroides) {
+    this.physics.pause();
+    player.setTint(0xff0000);
+    gameOver = true;
+}
+
+function createAsteroide(){
+    var random_boolean = Math.random() >= 0.5;
+    var x, y;
+
+    // borde superior o inferior
+    if (random_boolean){
+        x = Phaser.Math.Between(0,max_x);
+        
+        random_boolean = Math.random() >= 0.5;
+        if (random_boolean){      
+            y = 0;
+            return {ast :asteroides.create(x,y,'asteroide'), tipo: 1}
+        }
+        else {
+            y = max_y;
+            return {ast :asteroides.create(x,y,'asteroide'), tipo: 2}
+        }
+    }
+
+    // borde izquierdo o derecho
+    else {
+        y = Phaser.Math.Between(0,max_y);
+
+        random_boolean = Math.random() >= 0.5;
+        if (random_boolean){
+            x = 0;
+            return {ast :asteroides.create(x,y,'asteroide'), tipo: 3}
+        }
+        else {
+            x = max_x;
+            return {ast :asteroides.create(x,y,'asteroide'), tipo: 4}
+        }
+    }
+}
+
+
+// Función para establecer una trayectoria aleatoria para el asteroide
+function setPathAsteroide(asteroide){
+    var random_boolean = Math.random() >= 0.5;
+    var vel_x = 0;
+    var vel_y = 0;
+
+    // si es del tipo 1, sale del borde superior
+    if (asteroide.tipo == 1){
+        // velocidad_y siempre positiva (caída)
+        vel_y = Phaser.Math.Between(300, 500);
+
+        // puede ir hacia la izq o la dcha
+        if (random_boolean){
+            vel_x = Phaser.Math.Between(800,1000);
+        }
+        else {
+            vel_x = Phaser.Math.Between(-1000, -800);
+        }
+    }
+
+    // si es del tipo 2, sale del borde inferior
+    else if (asteroide.tipo == 2){
+        // velocidad_y siempre negativa (hacia arriba)
+        vel_y = Phaser.Math.Between(-500, -300);
+
+        // puede ir hacia la izq o la dcha
+        if (random_boolean){
+            vel_x = Phaser.Math.Between(800,1000);
+        }
+        else {
+            vel_x = Phaser.Math.Between(-1000, -800);
+        }
+    }
+
+    // si es del tipo 3, sale del borde izquierdo
+    else if (asteroide.tipo == 3){
+        // velocidad_x siempre positiva (hacia la derecha)
+        vel_x = Phaser.Math.Between(800,1000);
+
+        // puede ir hacia arriba o hacia abajo
+        if (random_boolean){
+            vel_y = Phaser.Math.Between(300, 500);
+        }
+        else {
+            vel_y = Phaser.Math.Between(-500, -300);
+        }
+    }
+
+
+    // si es del tipo 3, sale del borde derecho
+    else if (asteroide.tipo == 4){
+        // velocidad_x siempre negativa (hacia la izquierda)
+        vel_x = Phaser.Math.Between(-1000,-800);
+
+        // puede ir hacia arriba o hacia abajo
+        if (random_boolean){
+            vel_y = Phaser.Math.Between(300, 500);
+        }
+        else {
+            vel_y = Phaser.Math.Between(-500, -300);
+        }
+    }
+
+    asteroide.ast.setVelocity(vel_x, vel_y);
 }

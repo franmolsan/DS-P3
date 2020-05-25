@@ -37,6 +37,9 @@ export class LoadScene extends Phaser.Scene {
         this.load.image ('logo','assets/nombre.png');
 
         // cargar imagen personaje
+        this.load.image('asteroide', 'assets/pixel_asteroid.png');
+
+        // cargar imagen personaje
         this.load.spritesheet('personaje', 'assets/ship.png', {
             frameHeight: 24,
             frameWidth: 16
