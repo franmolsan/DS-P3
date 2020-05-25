@@ -12,6 +12,9 @@ export class MenuScene extends Phaser.Scene {
 
     init(m_menu){
         musica_menu = m_menu;
+        musica_menu.play({
+            loop: true
+        });
     }
 
     create(){
@@ -39,7 +42,8 @@ export class MenuScene extends Phaser.Scene {
         })
 
         playButton.on("pointerdown", () => {
-            this.scene.start(CST.SCENES.GAME, musica_menu)
+            musica_menu.stop();
+            this.scene.start(CST.SCENES.GAME)
         })
 
 
@@ -65,12 +69,12 @@ export class MenuScene extends Phaser.Scene {
         })
 
         rankingButton.on("pointerdown", () => {
-            this.scene.start(CST.SCENES.HIGHSCORE,"se lo paso a highscore")
+            musica_menu.stop();
+            this.scene.start(CST.SCENES.HIGHSCORE)
         })
 
         /* Logo */
         this.add.bitmapText(this.game.renderer.width / 2, this.game.renderer.height / 2 - this.game.renderer.height / 4, 'arcade', `AW-435`, 75).setTint(0xffffff).setOrigin(0.5);
-    
    
     }
 }

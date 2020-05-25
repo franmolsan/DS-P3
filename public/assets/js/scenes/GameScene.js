@@ -6,18 +6,20 @@ var musica_menu;
 var player;
 var gameStarted;
 var dificultad;
-var tiempo_inicial;
 var asteroides;
 var gameOver;
 var spawnAsteroide;
+var updateScore;
 var max_x;
 var max_y;
+var pauseButton;
 
 // score
-var score = 0;
+var score;
 var scoreString = "Score: ";
 var scoreText;
 
+var musica_juego;
 
 // clase "GameScene" (Escena del juego)
 export class GameScene extends Phaser.Scene {
@@ -28,29 +30,28 @@ export class GameScene extends Phaser.Scene {
         })
     }
 
-    init(m_menu){
-        musica_menu = m_menu;
-    }
+    init(){
+        score = 0;
 
-    preload(){
-        // cargar musica
-        this.load.audio('musica_juego','assets/game.wav');
-
-        // cargar fondo 
-        this.load.image('fondo_juego', 'assets/Strip And GIF/space_battle.png');
-    }
-
-    create(){
-        musica_menu.stop();
-
-        /* Musica */
-        this.sound.pauseOnBlur = false; // para que se escuche siempre, sin importar si se tabula o se cambia de pestaña
-
-        var musica_juego = this.sound.add('musica_juego');
+        musica_juego = this.sound.add('musica_juego');
 
         musica_juego.play({
             loop: true
         });
+
+        score = 0;
+        dificultad = 1;
+    }
+
+    preload(){
+       
+    }
+
+    create(){
+
+        /* Musica */
+        this.sound.pauseOnBlur = false; // para que se escuche siempre, sin importar si se tabula o se cambia de pestaña
+
 
         /* fondo */
         
@@ -61,61 +62,41 @@ export class GameScene extends Phaser.Scene {
         image.setScale(scale).setScrollFactor(0) // para que ocupe toda la pantalla del juego
         
         scoreText = this.add.text(32, 24, scoreString + score);
+        pauseButton = this.add.image(75, 100, 'pause');
+
+        pauseButton.setInteractive();
+
+        /* Eventos de puntero */
+        /*  pointerover: hover (pasar por encima el ratón)
+            pointerout: fuera (no hover)
+            pointerup: click y soltar
+            pointerdown: solo click
+        */
+
+        pauseButton.on("pointerover", () => {
+            pauseButton.setScale(1.2).setScrollFactor(0);
+        })
+
+        pauseButton.on("pointerout", () => {
+            pauseButton.setScale(1).setScrollFactor(0);
+        })
+
+        pauseButton.on("pointerdown", () => {
+            this.scene.pause(CST.SCENES.GAME)
+            this.scene.launch(CST.SCENES.PAUSE, musica_juego)
+        })
+        
 
         // Create player
         player = this.physics.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "personaje");
         player.setScale(4);
         player.setFrame(2);
         
-        // Create animations for player
-        this.anims.create({
-            key: "left",
-            frames: this.anims.generateFrameNumbers("personaje", { start: 2, end: 0 }),
-            repeat: 0
-        });
-
-        // Create animations for player
-        this.anims.create({
-            key: "finish-left",
-            frames: this.anims.generateFrameNumbers("personaje", { start: 0, end: 2 }),
-            repeat: 0
-        });
-        
-        this.anims.create({
-            key: "right",
-            frames: this.anims.generateFrameNumbers("personaje", { start: 2, end: 4 })
-        });
-
-        this.anims.create({
-            key: "finish-right",
-            frames: this.anims.generateFrameNumbers("personaje", { start: 4, end: 2 })
-        });
-
-        this.anims.create({
-            key: "down",
-            frames: this.anims.generateFrameNumbers("personaje", { start: 7, end: 2 }),
-        });
-
-        this.anims.create({
-            key: "up",
-            frames: this.anims.generateFrameNumbers("personaje", { start: 2, end: 7 })
-        });
-
-        /*
-        var frames_idle = this.anims.generateFrameNumbers("personaje", { start: 2, end: 2 })
-        frames_idle.push(this.anims.generateFrameNumbers("personaje", { start: 7, end: 7 }))
-        console.log();
-        this.anims.create({
-            key: "idle",
-            frames: [{key: "personaje", frames: 2}, {key: "personaje", frames: 4}],
-            repeat: -1
-        });
-        */
+        createAnimations(this);
 
 
         // Para que el jugador no salga de los bordes
         player.setCollideWorldBounds(true);
-
         asteroides = this.physics.add.group();
         this.physics.add.collider(player, asteroides, hitAsteroide, null, this);
 
@@ -125,16 +106,12 @@ export class GameScene extends Phaser.Scene {
         gameOver = false;
         gameStarted = true;
         dificultad = 1;
-        tiempo_inicial = Date.now();
-        setInterval( () => {
-            score += 10;
-            scoreText.setText(scoreString + score);
-            dificultad += 0.1;
-        },1000);
+   
+        updateScore = this.time.addEvent({ delay: 1000, callback: updateScoreEvent, callbackScope: this });
 
         max_x = this.cameras.main.width;
         max_y = this.cameras.main.height;
-        spawnAsteroide = this.time.addEvent({ delay: 100, callback: onEvent, callbackScope: this });
+        spawnAsteroide = this.time.addEvent({ delay: 100, callback: spawnAsteroideEvent, callbackScope: this });
     }
 
     update (){
@@ -172,24 +149,78 @@ export class GameScene extends Phaser.Scene {
             }
         }
 
-        if (gameOver){
-
+        if(gameOver){
+            finishGame(this);
         }
     }
     
 }
 
+// Crear animaciones para el jugador
+function createAnimations(that){
+    
+    that.anims.create({
+        key: "left",
+        frames: that.anims.generateFrameNumbers("personaje", { start: 2, end: 0 }),
+        repeat: 0
+    });
 
-function onEvent (){
-    var ast = createAsteroide();
-    setPathAsteroide(ast);
-    spawnAsteroide.reset({ delay: Phaser.Math.Between(2000,4000)/dificultad, callback: onEvent, callbackScope: this, repeat: 1});
+    that.anims.create({
+        key: "finish-left",
+        frames: that.anims.generateFrameNumbers("personaje", { start: 0, end: 2 }),
+        repeat: 0
+    });
+    
+    that.anims.create({
+        key: "right",
+        frames: that.anims.generateFrameNumbers("personaje", { start: 2, end: 4 })
+    });
+
+    that.anims.create({
+        key: "finish-right",
+        frames: that.anims.generateFrameNumbers("personaje", { start: 4, end: 2 })
+    });
+
+    that.anims.create({
+        key: "down",
+        frames: that.anims.generateFrameNumbers("personaje", { start: 7, end: 2 }),
+    });
+
+    that.anims.create({
+        key: "up",
+        frames: that.anims.generateFrameNumbers("personaje", { start: 2, end: 7 })
+    });
+
 }
+
+function updateScoreEvent (){
+    if (!gameOver){
+        score += 10;
+        scoreText.setText(scoreString + score);
+        dificultad += 0.1;
+        updateScore.reset({ delay: 1000, callback: updateScoreEvent, callbackScope: this, repeat: 1 })
+    }
+        
+}
+
+function spawnAsteroideEvent (){
+    if (!gameOver){
+        var ast = createAsteroide();
+        setPathAsteroide(ast);
+        spawnAsteroide.reset({ delay: Phaser.Math.Between(2000,4000)/dificultad, callback: spawnAsteroideEvent, callbackScope: this, repeat: 1});
+    }
+}
+
 
 function hitAsteroide (player, asteroides) {
     this.physics.pause();
     player.setTint(0xff0000);
     gameOver = true;
+}
+
+function finishGame(that){
+    musica_juego.stop();
+    that.scene.start(CST.SCENES.DEATH, score);
 }
 
 function createAsteroide(){

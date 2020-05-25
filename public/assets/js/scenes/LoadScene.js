@@ -2,7 +2,8 @@ import { CST } from "../CST.js"; // importar claves
 import { MenuScene } from "./MenuScene.js";
 import { HighscoreScene } from "./HighscoreScene.js";
 import { GameScene } from "./GameScene.js";
-
+import { PauseScene } from "./PauseScene.js";
+import { DeathScene } from "./DeathScene.js";
 
 // clase "LoadScene" (Escena de carga)
 export class LoadScene extends Phaser.Scene {
@@ -32,6 +33,9 @@ export class LoadScene extends Phaser.Scene {
 
         // cargar imagen para el botón de volver atrás
         this.load.image ('back','assets/back.png');
+
+        // cargar imagen para el botón de pausa
+        this.load.image('pause','assets/pause.png')
         
         // cargar logo
         this.load.image ('logo','assets/nombre.png');
@@ -47,6 +51,12 @@ export class LoadScene extends Phaser.Scene {
 
         // cargar musica
         this.load.audio('musica_menu','assets/menu.wav');
+        this.load.audio('musica_ranking', 'assets/game.wav')
+        this.load.audio('musica_juego','assets/battle.wav');
+        this.load.audio('musica_fin','assets/death.mp3');
+
+        // cargar fondo de la partida
+        this.load.image('fondo_juego', 'assets/Strip And GIF/space_battle.png');
 
         // barra de carga 
         let loadingBar = this.add.graphics({
@@ -58,15 +68,6 @@ export class LoadScene extends Phaser.Scene {
         // Eventos de carga:
         // complete: cuando se termina de cargar todo
         // progress: número (decimal) que indica el progreso
-
-        // simular carga grande
-        /*
-        for(let i=0; i<1000000000; i++){
-            this.load.spritesheet('personaje', 'assets/ship.png', {
-                frameHeight: 16,
-                frameWidth: 16
-            });
-        }*/
 
         this.load.on("progress", (percent) =>{
             loadingBar.fillRect(0, this.game.renderer.height/2, this.game.renderer.width * percent, 50);
@@ -83,16 +84,13 @@ export class LoadScene extends Phaser.Scene {
         this.scene.add(CST.SCENES.GAME, GameScene, false);
         this.scene.add(CST.SCENES.HIGHSCORE, HighscoreScene, false);
         this.scene.add(CST.SCENES.MENU, MenuScene, false);
+        this.scene.add(CST.SCENES.PAUSE, PauseScene, false);
+        this.scene.add(CST.SCENES.DEATH, DeathScene, false);
 
         /* Musica */
         this.sound.pauseOnBlur = false; // para que se escuche siempre, sin importar si se tabula o se cambia de pestaña
 
         var musica_menu = this.sound.add('musica_menu');
-
-        musica_menu.play({
-            loop: true
-        });
-
 
         // pasar a la escena del menú
         this.scene.start(CST.SCENES.MENU, musica_menu); 

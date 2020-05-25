@@ -4,6 +4,8 @@ export const CST =  {
         HIGHSCORE: "HIGHSCORE",
         LOAD: "LOAD",
         MENU: "MENU",
-        GAME: "GAME"
+        GAME: "GAME",
+        PAUSE: "PAUSE",
+        DEATH: "DEATH"
     }
 }

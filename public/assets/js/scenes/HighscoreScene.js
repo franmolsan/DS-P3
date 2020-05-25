@@ -1,7 +1,8 @@
 import { CST } from "../CST.js"; // importar claves
 import { MenuScene } from "./MenuScene.js";
 
-let game, scores;
+var scores;
+var musica_ranking, musica_menu;
 
 export class HighscoreScene extends Phaser.Scene {
 
@@ -14,9 +15,11 @@ export class HighscoreScene extends Phaser.Scene {
     }
 
 
-    init(data){
-        console.log(data);
-        console.log("Soy highscore y lo pillo");
+    init(){
+        musica_ranking = this.sound.add('musica_ranking');
+        musica_ranking.play({
+            loop: true
+        });
     }
   
     preload() { // cargar tipografía
@@ -52,7 +55,7 @@ export class HighscoreScene extends Phaser.Scene {
         }
       }
 
-      /* Botón de ranking */ 
+      /* Botón para volver atrás */ 
       let backButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2 + this.game.renderer.height / 2.8, 'back')
       backButton.setScale(0.7).setScrollFactor(0);
 
@@ -74,7 +77,7 @@ export class HighscoreScene extends Phaser.Scene {
       })
 
       backButton.on("pointerdown", () => {
-        
+        musica_ranking.stop();
         this.scene.start(CST.SCENES.MENU)
       })
 
