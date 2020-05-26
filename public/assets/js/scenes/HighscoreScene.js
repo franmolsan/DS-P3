@@ -1,8 +1,8 @@
 import { CST } from "../CST.js"; // importar claves
 import { MenuScene } from "./MenuScene.js";
 
-var scores;
 var musica_ranking, musica_menu;
+var scores = []
 
 export class HighscoreScene extends Phaser.Scene {
 
@@ -20,10 +20,20 @@ export class HighscoreScene extends Phaser.Scene {
         musica_ranking.play({
             loop: true
         });
-    }
-  
-    preload() { // cargar tipografía
-      
+
+        // petición para obtener las highscores
+        $.ajax({
+          type: 'GET',
+          url: '/scores',
+          success: function(data) {
+            scores = data;
+            console.log(scores);
+          },
+          error: function(xhr) {
+            console.log(xhr);
+          },
+          async : false // para que obtenga las puntaciones antes de mostrarlas
+        });
     }
   
     create() {
@@ -85,15 +95,3 @@ export class HighscoreScene extends Phaser.Scene {
 
 
   }
-
-  // petición para obtener las highscores
-  $.ajax({
-    type: 'GET',
-    url: '/scores',
-    success: function(data) {
-      scores = data;
-    },
-    error: function(xhr) {
-      console.log(xhr);
-    }
-  });

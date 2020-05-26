@@ -133,15 +133,16 @@ export class GameScene extends Phaser.Scene {
 
         if (gameStarted) {
 
+            /* Movimiento del personaje */
             if (cursors.up.isDown) {
                 //  Move up
-                player.setVelocityY(-300);
+                player.setVelocityY(-400);
                 player.anims.play("up");
                 
             } 
             else if (cursors.down.isDown) {
                 //  Move down
-                player.setVelocityY(300);
+                player.setVelocityY(400);
                 player.anims.play("down");
                
             }
@@ -149,18 +150,19 @@ export class GameScene extends Phaser.Scene {
             if (cursors.left.isDown) {
                 //  Move to the left
                 player.anims.play("left");
-                player.setVelocityX(-300);
+                player.setVelocityX(-400);
                 player.anims.play("finish-left");
                 
             } 
             else if (cursors.right.isDown) {
                 //  Move to the right
                 player.anims.play("right");
-                player.setVelocityX(300);
+                player.setVelocityX(400);
                 player.anims.play("finish-right");
                 
             }
 
+            /* Habilidad */
             if (spaceBar.isDown && !invulnerable && valor_cooldown === 0){
                 choques.active = false;
                 invulnerable = true;
@@ -234,7 +236,6 @@ function updateScoreEvent (){
         scoreText.setText(scoreString + score);
         dificultad += 0.1;
         updateScore.reset({ delay: 1000, callback: updateScoreEvent, callbackScope: this, repeat: 1 })
-
     }
         
 }
@@ -344,7 +345,7 @@ function setPathAsteroide(asteroide){
     }
 
 
-    // si es del tipo 3, sale del borde derecho
+    // si es del tipo 4, sale del borde derecho
     else if (asteroide.tipo == 4){
         // velocidad_x siempre negativa (hacia la izquierda)
         vel_x = Phaser.Math.Between(-1000,-800);
@@ -365,5 +366,4 @@ function setInvulnerableEvent(){
     player.setTint(0xffffff);
     choques.active = true;
     invulnerable = false;
-
 }

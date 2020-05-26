@@ -1,6 +1,6 @@
 import { CST } from "../CST.js"; // importar claves
 
-var musica_fin, score;
+var musica_fin, score_obtenida;
 
 
 // clase "DeathScene" (Escena de muertee - cuando colisiona con un asteoride)
@@ -16,11 +16,29 @@ export class DeathScene extends Phaser.Scene {
         musica_fin = this.sound.add('musica_fin');
         musica_fin.play();
         if (isNaN(s)){
-            score = 0;
+            score_obtenida = 0;
         }
         else {
-            score = s;
+            score_obtenida = s;
         }
+
+        var x = document.cookie;
+        var data = {
+            email: parseJwt(x).user.email,
+            score: score_obtenida
+        }
+        // petición para enviar la score
+        $.ajax({
+            type: 'POST',
+            url: '/submit-score',
+            data: data,
+            success: function(data) {
+            console.log(data);
+            },
+            error: function(xhr) {
+            console.log(xhr);
+            }
+        });
     }
 
     preload(){
@@ -30,7 +48,7 @@ export class DeathScene extends Phaser.Scene {
 
         /* Cartel de muerte */
         this.add.bitmapText(this.game.renderer.width / 2, this.game.renderer.height / 2 - this.game.renderer.height / 3, 'arcade', `Te han dado`, 60).setTint(0xffffff).setOrigin(0.5);
-        this.add.bitmapText(this.game.renderer.width / 2, this.game.renderer.height / 2 - this.game.renderer.height / 4, 'arcade', `Puntacion: ${score}`, 30).setTint(0xffffff).setOrigin(0.5);
+        this.add.bitmapText(this.game.renderer.width / 2, this.game.renderer.height / 2 - this.game.renderer.height / 4, 'arcade', `Puntacion: ${score_obtenida}`, 30).setTint(0xffffff).setOrigin(0.5);
 
         /* Botón para volver atrás */ 
         let backButton = this.add.image(this.game.renderer.width / 2, this.game.renderer.height / 2 + this.game.renderer.height / 4, 'back')
@@ -80,3 +98,11 @@ export class DeathScene extends Phaser.Scene {
 
     }
 }
+
+function parseJwt(token) {
+    if (!token) { return; }
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace('-', '+').replace('_', '/');
+    return JSON.parse(window.atob(base64));
+}
+

@@ -1,9 +1,7 @@
-let game, scores;
+let game;
 
 // importar escenas
 import {LoadScene} from "./scenes/LoadScene.js";
-import {MenuScene} from "./scenes/MenuScene.js";
-import {HighscoreScene} from "./scenes/HighscoreScene.js";
 
 let config = {
   type: Phaser.AUTO,
