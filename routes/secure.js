@@ -8,7 +8,16 @@ const router = express.Router();
 
 router.post('/submit-score', asyncMiddleware(async (req, res, next) => {
   const { email, score } = req.body;
-  await UserModel.updateOne({ email }, { highScore: score });
+
+  // obtener highscore actual almacenado en la bd
+  var playerHighScore =  (await UserModel.findOne({email: email}, 'highScore -_id')).toJSON();
+
+  console.log (playerHighScore.highScore);
+  // solo se actualiza si el score conseguido en la partida es mayor.
+  if (score > playerHighScore.highScore){
+    await UserModel.updateOne({ email }, { highScore: score });
+  }
+  
   res.status(200).json({ status: 'ok' });
 }));
 
