@@ -1,4 +1,4 @@
-# Práctica 3: Análisis y diseño
+# Desarrollo de software. Práctica 3
 * Francisco José Molina Sánchez
 * Miguel Ángel Molina Jordán
 
@@ -27,4 +27,6 @@
 3. La parte del servidor se encargará de la autenticación y gestión de los usuarios, y los datos de puntuaciones de los usuarios (leaderboard).
 
 4. La parte del servidor usará Node.js, Express y MongoDB.
+
+(más información en la memoria)
 
