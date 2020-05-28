@@ -42,27 +42,25 @@ export class HighscoreScene extends Phaser.Scene {
       let scaleY = this.cameras.main.height / image.height
       let scale = Math.max(scaleX, scaleY)
       image.setScale(scale).setScrollFactor(0)
-      this.add.bitmapText(60, 60, 'arcade', 'POSICION PUNTUACION NOMBRE').setTint(0xffffff);
+      //this.game.renderer.width / 2
+      this.add.bitmapText(this.game.renderer.width / 4, 60, 'arcade', 'POSICION').setTint(0xffffff).setOrigin(0.5);
+      this.add.bitmapText(this.game.renderer.width / 2,  60, 'arcade', 'SCORE').setTint(0xffffff).setOrigin(0.5);
+      this.add.bitmapText(3 * this.game.renderer.width / 4, 60, 'arcade', 'NOMBRE').setTint(0xffffff).setOrigin(0.5);
   
       // obtener los 10 primeros highscores
       // y formatearlos
       for (let i = 1; i < 11; i++) {
-        if (i!= 10){
-          if (scores[i-1]) {
-            this.add.bitmapText(150, 80 + 50 * i, 'arcade', ` ${i}         ${scores[i-1].highScore}      ${scores[i-1].name}`).setTint(0xffffff);
-          } 
-          else {
-            this.add.bitmapText(150, 80 + 50 * i, 'arcade', ` ${i}         0      ---`).setTint(0xffffff);
-          }
-        }
+
+        this.add.bitmapText(this.game.renderer.width / 4, 80 + 50 * i, 'arcade', `${i}`).setTint(0xffffff).setOrigin(0.5);
+        if (scores[i-1]) {
+          this.add.bitmapText(this.game.renderer.width / 2,  80 + 50 * i, 'arcade', `${scores[i-1].highScore}`).setTint(0xffffff).setOrigin(0.5);
+          this.add.bitmapText(3 * this.game.renderer.width / 4, 80 + 50 * i, 'arcade', `${scores[i-1].name}`).setTint(0xffffff).setOrigin(0.5);
+        } 
         else {
-          if (scores[i-1]) {
-            this.add.bitmapText(150, 80 + 50 * i, 'arcade', `${i}         ${scores[i-1].highScore}      ${scores[i-1].name}`).setTint(0xffffff);
-          } 
-          else {
-            this.add.bitmapText(150, 80 + 50 * i, 'arcade', `${i}         0      ---`).setTint(0xffffff);
-          }
+          this.add.bitmapText(this.game.renderer.width / 2,  80 + 50 * i, 'arcade', `0`).setTint(0xffffff).setOrigin(0.5);
+          this.add.bitmapText(3 * this.game.renderer.width / 4, 80 + 50 * i, 'arcade', `----`).setTint(0xffffff).setOrigin(0.5);
         }
+        
       }
 
       /* Botón para volver atrás */ 
